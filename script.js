@@ -96,6 +96,9 @@ function expenseAdd(newExpense) {
     // Adiciona o item na lista
     expenseList.append(expenseItem)
 
+    // Limpa o formúlario para adicionar um noo item.
+    formclear()
+
     // Atualiza os totais 
     updateTotals()
     } catch (error) {
@@ -121,7 +124,7 @@ function updateTotals() {
             const itemAmount = items[item].querySelector(".expense-amount") 
             
             // Remore caracteres não número e sbstitui a vírgula por ponto 
-            let value = itemAmount.textContent.replace(/[^\d]/g, ""). replace(",",".")
+            let value = itemAmount.textContent.replace(/[^\d,]/g, ""). replace(",",".")
 
             // Converte o valor para float
             value = parseFloat(value)
@@ -135,9 +138,46 @@ function updateTotals() {
             total += Number(value)
         }
 
-        expenseTotal.textContent = total
+        // Cria a span para adicionar o R$ formatado 
+        const symbolBRL = document.createElement("small") 
+        symbolBRL.textContent = "R$"  
+
+        // Formata o valor e remove o R$ que será exibido pela small com um estilo costumizado 
+        total = formatCurrencyBRL(total).toUpperCase().replace("R$", "")
+
+        // Limpa o conteúdo do elemento
+        expenseTotal.innerHTML = ""
+        
+        // Adiciona o símbolo da moeda e o valor formatado   
+        expenseTotal.append(symbolBRL, total)
+
     } catch (error) {
         console.log(error) 
         alert("Não foi possivel atualizar o total de despesa")   
     }
+}
+
+// Evento que captura o clique nos itens da lista
+expenseList.addEventListener("click", function (event) {
+    //Veriica se o elemento clicado é o ícone de remover 
+    if(event.target.classList.contains("remove-icon")) {
+        // Obtém a li pai do elemento clicado
+        const item = event.target.closest(".expense")
+
+        // Remove o item d alista
+        item.remove()
+    }
+
+    // Atualiza os totais
+    updateTotals() 
+})
+
+function formclear() {
+    //  Limpa os inputs
+    expense.value = ""
+    category.value = ""
+    amount.value = ""
+
+    // Coloca o foco no input do amount
+    expense.focus()
 }
